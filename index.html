@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Apology Scrapbook</title>
+
+    <style>
+        :root {
+            /* Scrapbook Colors */
+            --bg-color: #fdfbf7;
+            --paper-line: #aab7c4;
+            --ink-dark: #2c3e50;
+            --ink-red: #e74c3c; 
+            --ink-blue: #3498db;
+            --tape-color-1: rgba(255, 99, 71, 0.7);
+            --tape-color-2: rgba(135, 206, 250, 0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            /* Using System Fonts for Mac to ensure it loads instantly */
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Marker Felt', sans-serif;
+            background-color: var(--bg-color);
+            /* Lined paper pattern */
+            background-image: 
+                linear-gradient(90deg, transparent 79px, var(--paper-line) 79px, var(--paper-line) 81px, transparent 81px),
+                linear-gradient(#eee .1em, transparent .1em);
+            background-size: 100% 100%;
+            color: var(--ink-dark);
+            overflow-x: hidden;
+            font-size: 1.2rem;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Background "I'm Sorry" Text */
+        .bg-scribbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-text {
+            position: absolute;
+            font-size: 3rem;
+            color: rgba(231, 76, 60, 0.08); 
+            transform: rotate(var(--r));
+            white-space: nowrap;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 4rem 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 4.5rem;
+            color: var(--ink-red);
+            transform: rotate(-2deg);
+            text-shadow: 2px 2px 0px #fff, 3px 3px 0px #000;
+            margin-bottom: 1rem;
+        }
+
+        .header-note {
+            background: #fff;
+            display: inline-block;
+            padding: 1.5rem;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.1);
+            transform: rotate(1deg);
+            max-width: 600px;
+            margin-top: 2rem;
+            position: relative;
+            border: 1px solid #eee;
+        }
+
+        .header-note::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%) rotate(1deg);
+            width: 120px;
+            height: 35px;
+            background-color: var(--tape-color-2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* Gallery */
+        .scrapbook-gallery {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6rem;
+            padding-bottom: 6rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Polaroid Cards */
+        .polaroid {
+            background: white;
+            padding: 15px 15px 60px 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .polaroid:nth-child(odd) { transform: rotate(-3deg); }
+        .polaroid:nth-child(even) { transform: rotate(3deg); }
+        .polaroid:hover { transform: scale(1.05) rotate(0deg); z-index: 10; }
+
+        /* Tape */
+        .tape {
+            position: absolute;
+            width: 100px;
+            height: 30px;
+            top: -15px;
+            opacity: 0.8;
+            z-index: 5;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .tape-1 { background: var(--tape-color-1); left: 30%; transform: rotate(-15deg); }
+        .tape-2 { background: var(--tape-color-2); left: 60%; transform: rotate(15deg); }
+
+        .polaroid-img-container {
+            width: 100%;
+            height: 350px;
+            background: #eee;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .polaroid-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: sepia(20%);
+            transition: filter 0.3s;
+        }
+
+        .polaroid:hover .polaroid-img-container img {
+            filter: sepia(0%);
+        }
+
+        .polaroid-caption {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--ink-dark);
+            font-weight: bold;
+        }
+
+        /* Interactive Section */
+        #final-decision {
+            margin-top: 4rem;
+            padding: 4rem;
+            background: #fff;
+            border: 3px dashed var(--ink-blue);
+            border-radius: 20px;
+            text-align: center;
+            position: relative;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 10px 10px 0px #ddd;
+        }
+
+        #decision-frame {
+            width: 300px;
+            height: 300px;
+            margin: 0 auto 2rem;
+            border: 10px solid #eee;
+            border-radius: 50%;
+            padding: 10px;
+            position: relative;
+            /* Ensure image stays circular */
+            overflow: hidden; 
+        }
+
+        #decision-frame img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--ink-dark);
+            transition: transform 0.3s ease;
+        }
+
+        /* Speech Bubble for the Cat */
+        .cat-speech-bubble {
+            background: #fff;
+            border: 2px solid var(--ink-dark);
+            border-radius: 20px;
+            padding: 10px 20px;
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 3px 3px 0px rgba(0,0,0,0.1);
+            z-index: 20;
+            display: none; /* Hidden by default */
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .cat-speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: var(--ink-dark) transparent;
+            display: block;
+            width: 0;
+        }
+
+        @keyframes popIn {
+            from { transform: translateX(-50%) scale(0); }
+            to { transform: translateX(-50%) scale(1); }
+        }
+
+        #big-question {
+            font-size: 3rem;
+            color: var(--ink-dark);
+            margin-bottom: 3rem;
+            line-height: 1.1;
+            transition: all 0.2s;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4rem;
+            min-height: 120px;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .sticker-btn {
+            font-weight: 700;
+            border: 3px solid var(--ink-dark);
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0px var(--ink-dark);
+            background: white;
+            position: relative; /* To stay above bubbles if overlap */
+            z-index: 25;
+        }
+
+        .sticker-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--ink-dark);
+        }
+
+        .sticker-yes {
+            background-color: #2ecc71;
+            color: white;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            transform: rotate(5deg);
+            transition: all 0.3s ease;
+        }
+
+        .sticker-no {
+            background-color: #e74c3c;
+            color: white;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            transform: rotate(-2deg);
+            transition: all 0.3s ease;
+        }
+
+        /* Success Overlay */
+        #party-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.98);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        #party-overlay h1 {
+            font-size: 7rem;
+            color: var(--ink-red);
+            margin-bottom: 0;
+        }
+        
+        #party-overlay img {
+            width: 500px;
+            height: 500px;
+            border-radius: 30px;
+            border: 15px solid white;
+            box-shadow: 0 0 50px rgba(0,0,0,0.3);
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes bounce {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            .btn-group { flex-direction: column; gap: 2rem; }
+            #party-overlay h1 { font-size: 4rem; }
+            #party-overlay img { width: 300px; height: 300px; }
+            #decision-frame { width: 250px; height: 250px; }
+            .cat-speech-bubble { font-size: 1rem; top: -50px; width: 200px; white-space: normal;}
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background -->
+    <div class="bg-scribbles" id="bg-scribbles"></div>
+
+    <header>
+        <h1>I messed up...</h1>
+        <div class="header-note">
+            <p>I was wrong. I admit it. Please read through this journal while I sit in corner of shame.</p>
+        </div>
+    </header>
+
+    <main class="scrapbook-gallery">
+        
+        <!-- Cards -->
+        <div class="polaroid">
+            <div class="tape tape-1"></div>
+            <div class="tape tape-2"></div>
+            <div class="polaroid-img-container">
+                <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXY4NzVrMXdxYjRhZGY2NXJsdmt2anVxNmZ2MGRzMXoyOHd3YjRmYiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9XjyfcSzWTgMWEscnD/giphy.gif" alt="Guilty Cat">
+            </div>
+            <div class="polaroid-caption">I was acting <span style="background:rgba(255,255,0,0.3)">bad</span>...</div>
+        </div>
+
+        <div class="polaroid">
+            <div class="tape tape-1"></div>
+            <div class="polaroid-img-container">
+                <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3h1ZGVnZWk1cXAxNzdqeWJ5NHY1YnJ3Z3E2OWZ1OHdsNDR1bXM4YSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/pSytKOSpHZJcY/giphy.gif" alt="Scared Cat">
+            </div>
+            <div class="polaroid-caption">My ears are down in <span style="background:rgba(255,255,0,0.3)">shame</span>.</div>
+        </div>
+
+        <div class="polaroid">
+            <div class="tape tape-2"></div>
+            <div class="polaroid-img-container">
+                <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzg2Zms2d3E4eTJzb3V5MmpobXk5OGhlYjg1YXFuZTd2dW81djRjcyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/PJeKg31621Wgw/giphy.gif" alt="Hiding Cat">
+            </div>
+            <div class="polaroid-caption">I'm hiding my face.</div>
+        </div>
+
+        <div class="polaroid">
+            <div class="tape tape-1"></div>
+            <div class="tape tape-2"></div>
+            <div class="polaroid-img-container">
+                <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHByNmEzenk3dWM0MXI3N3hjem5xMnN5dmhjNTBieXZyMjFqNmt0cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ixSP5EGUdIEaP4dN2h/giphy.gif" alt="Pleading Cat">
+            </div>
+            <div class="polaroid-caption">Just <span style="background:rgba(255,255,0,0.3)">look</span> at me...</div>
+        </div>
+
+        <div class="polaroid">
+            <div class="tape tape-2"></div>
+            <div class="polaroid-img-container">
+                <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExeDgyZ21xbGhnbGVpbmV4MHk3Z2g3OGRxNWZ4aG1vejluY2J4NDJhbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/9uwnYUDw342pq/giphy.gif" alt="Very Sad Cat">
+            </div>
+            <div class="polaroid-caption">Please don't be mad.</div>
+        </div>
+
+        <!-- Final Section -->
+        <section id="final-decision">
+            <div id="decision-frame">
+                <img id="main-cat" src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWZtajFrcno2aGw5bmV1emMxeGJpdzc1Nmt6bjkyb2IzMzdsNnc4YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Zl7u48zLVFgLpRwq6f/giphy.gif" alt="Main Guilty Cat">
+                <!-- Speech Bubble for the No interactions -->
+                <div id="cat-speech" class="cat-speech-bubble">No! Don't do it!</div>
+            </div>
+            
+            <h2 id="big-question">Do you forgive me? 🥺</h2>
+            
+            <div class="btn-group">
+                <button class="sticker-btn sticker-yes" id="yesBtn">YES PLEASE! ❤️</button>
+                <button class="sticker-btn sticker-no" id="noBtn">No 😿</button>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="party-overlay">
+        <img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExeTJ5OWh0Z2E5NmZnMzl4M3N4M3o0NGc1cml2aGZ6NWNhNm1hOXQ2bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/znreqlPeGdikLLB2C4/giphy.gif" alt="Dancing Cat">
+        <h1>YIPPEEEEEEE!</h1>
+        <p style="font-size: 2rem; margin-top: 1rem;">You are best!</p>
+    </div>
+
+    <script>
+        // Populate Background
+        const bgScribbles = document.getElementById('bg-scribbles');
+        const sorryPhrases = ["I'm sorry", "Forgive me", "I messed up", "Please", "So sorry", "My bad"];
+        
+        for(let i=0; i<15; i++) {
+            const textEl = document.createElement('div');
+            textEl.classList.add('bg-text');
+            textEl.innerText = sorryPhrases[Math.floor(Math.random() * sorryPhrases.length)];
+            textEl.style.top = Math.random() * 100 + '%';
+            textEl.style.left = Math.random() * 100 + '%';
+            textEl.style.setProperty('--r', (Math.random() * 40 - 20) + 'deg'); 
+            bgScribbles.appendChild(textEl);
+        }
+
+        // Logic Elements
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const mainCat = document.getElementById('main-cat');
+        const questionText = document.getElementById('big-question');
+        const overlay = document.getElementById('party-overlay');
+        const speechBubble = document.getElementById('cat-speech');
+
+        // State Variables
+        let noSize = 1.0;
+        let yesSize = 1.0;
+        let clickCount = 0;
+
+        // List of Begging Cat GIFs (Direct Giphy URLs for stability)
+        const beggingCats = [
+            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTA5MDJ3aWQ0Mnl0enVpN3c3OTlzdDdpeHNiM2wxdXhsa3J2MGtvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/e1Tf1eOo6976zuGv3C/giphy.gif", // Cat reaching hands
+            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTA5MDJ3aWQ0Mnl0enVpN3c3OTlzdDdpeHNiM2wxdXhsa3J2MGtvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/e1Tf1eOo6976zuGv3C/giphy.gif",  // Cat looking up sad
+            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTA5MDJ3aWQ0Mnl0enVpN3c3OTlzdDdpeHNiM2wxdXhsa3J2MGtvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/e1Tf1eOo6976zuGv3C/giphy.gif", // Big eyes
+            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTA5MDJ3aWQ0Mnl0enVpN3c3OTlzdDdpeHNiM2wxdXhsa3J2MGtvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/e1Tf1eOo6976zuGv3C/giphy.gif",  // Cat waving no
+            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTA5MDJ3aWQ0Mnl0enVpN3c3OTlzdDdpeHNiM2wxdXhsa3J2MGtvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/e1Tf1eOo6976zuGv3C/giphy.gif", // Cat meowing
+            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTA5MDJ3aWQ0Mnl0enVpN3c3OTlzdDdpeHNiM2wxdXhsa3J2MGtvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/e1Tf1eOo6976zuGv3C/giphy.gif", // Very cute face
+            "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTA5MDJ3aWQ0Mnl0enVpN3c3OTlzdDdpeHNiM2wxdXhsa3J2MGtvdSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/e1Tf1eOo6976zuGv3C/giphy.gif"  // Cat with paws up begging
+        ];
+
+        // Text prompts for the question area
+        const prompts = [
+            "Please? 😿",
+            "Look at my guilty face...",
+            "I'll buy you snacks!",
+            "I'm literally crying!",
+            "Don't break my heart!",
+            "Look at sad kitty!",
+            "Yes is getting bigger...",
+            "Click -> green one!",
+            "Are you really sure?",
+            "I promise I'll listen!"
+        ];
+
+        // Text the cat says in the bubble when "No" is clicked
+        const catSpeech = [
+            "No!",
+            "Plz no!",
+            "Don't do it!",
+            "Have heart!",
+            "I'm cute!",
+            "Say yes!",
+            "Why????",
+            "Sniff sniff..."
+        ];
+
+        noBtn.addEventListener('click', () => {
+            clickCount++;
+            
+            // 1. Change Main Text
+            const promptIndex = Math.min(clickCount - 1, prompts.length - 1);
+            questionText.innerText = prompts[promptIndex];
+            
+            // Shake effect on question text
+            questionText.style.transform = `rotate(${Math.random() * 10 - 5}deg)`;
+            setTimeout(() => questionText.style.transform = 'none', 200);
+
+            // 2. Change Cat Image to a Begging GIF
+            // Pick a random gif from the list
+            const randomGifIndex = Math.floor(Math.random() * beggingCats.length);
+            mainCat.src = beggingCats[randomGifIndex];
+
+            // 3. Show Speech Bubble with random "No" text
+            const randomSpeechIndex = Math.floor(Math.random() * catSpeech.length);
+            speechBubble.innerText = catSpeech[randomSpeechIndex];
+            speechBubble.style.display = 'block';
+            
+            // Re-trigger animation
+            speechBubble.style.animation = 'none';
+            speechBubble.offsetHeight; /* trigger reflow */
+            speechBubble.style.animation = 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+
+            // 4. Resize Buttons
+            noSize *= 0.75; // Shrink No
+            yesSize *= 1.35; // Grow Yes
+
+            // Apply sizes with a bit of random rotation
+            noBtn.style.transform = `scale(${noSize}) rotate(${Math.random() * 10 - 5}deg)`;
+            yesBtn.style.transform = `scale(${yesSize}) rotate(5deg)`;
+
+            // Hide No button if it gets too small
+            if (noSize < 0.2) {
+                noBtn.innerText = "😭";
+                noBtn.style.opacity = "0.5";
+            }
+        });
+
+        yesBtn.addEventListener('click', () => {
+            overlay.style.display = 'flex';
+            
+            // Simple confetti effect
+            for (let i = 0; i < 50; i++) {
+                const conf = document.createElement('div');
+                conf.style.position = 'absolute';
+                conf.style.width = '15px';
+                conf.style.height = '15px';
+                conf.style.backgroundColor = ['#e74c3c', '#3498db', '#2ecc71', '#f1c40f'][Math.floor(Math.random()*4)];
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.top = '-20px';
+                conf.style.zIndex = '1001';
+                conf.style.borderRadius = '50%';
+                // Add falling animation via JS for simplicity or just let them exist
+                document.body.appendChild(conf);
+
+                // Animate falling
+                const speed = Math.random() * 3 + 2;
+                const animateConf = () => {
+                    let top = parseFloat(conf.style.top);
+                    if (top > window.innerHeight) {
+                        conf.remove();
+                    } else {
+                        conf.style.top = (top + speed) + 'px';
+                        conf.style.left = (parseFloat(conf.style.left) + Math.sin(top/50)) + 'px'; // Wiggle
+                        requestAnimationFrame(animateConf);
+                    }
+                };
+                animateConf();
+                
+                // Remove after 3 seconds just in case
+                setTimeout(() => conf.remove(), 3000);
+            }
+        });
+    </script>
+</body>
+</html>
